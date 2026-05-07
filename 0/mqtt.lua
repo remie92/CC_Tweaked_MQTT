@@ -1,0 +1,1 @@
+print("Okay, this is a nice test MQTT file!")
