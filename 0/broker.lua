@@ -1,10 +1,10 @@
 peripheral.find("modem", rednet.open)
 
 function lib_sender(id)
+    print("Sending MQTT File to ",id)
     local file = io.open("mqtt.lua", "r")
-    print("Wow",file:read("a"))
+    rednet.send(id,file:read("a"),"MQTT_LIB_MQTT")
     file:close()
-    --rednet.send(id,)
 end
 
 function rednet_receiver()
