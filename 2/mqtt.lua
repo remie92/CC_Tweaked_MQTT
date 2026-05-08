@@ -14,5 +14,9 @@ function mqtt.pinger()
 end
 
 function mqtt.subscribe(topic)
+    rednet.send(mqtt.broker,topic,"SUBSCRIBE")
+end
 
+function mqtt.publish(topic,data)
+    rednet.send(mqtt.broker,{topic,data},"SUBSCRIBE")
 end

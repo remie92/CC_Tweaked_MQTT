@@ -8,11 +8,24 @@ function clients.setMonitor(monitor)
     clients.monitor.setTextScale(0.5)
 end
 
-
 function clients.got_update(id)
     for i, v in ipairs(clients.connected) do
-        if v.id==id then
-            v.time=os.clock()
+        if v.id == id then
+            v.time = os.clock()
+        end
+    end
+end
+
+function clients.addTopic(id, topic)
+    for i, v in ipairs(clients.connected) do
+        if v.id == id then
+            for _, top in ipairs(v.topics) do
+                if top == topic then
+                    logger.log(id .. " tried to subscribe to " .. topic .. " twice!", "warning")
+                    return
+                end
+            end
+            table.insert(v.topics, topic)
         end
     end
 end
@@ -21,10 +34,9 @@ function clients.client_ticker()
     while true do
         sleep(0.4)
         for i = #clients.connected, 1, -1 do
-            if os.clock()-clients.connected[i].time > 90 then
+            if os.clock() - clients.connected[i].time > 90 then
                 logger.log(clients.connected[i].id .. " disconnected!", "connection")
                 table.remove(clients.connected, i)
-                
             end
         end
 
@@ -37,18 +49,18 @@ function clients.client_ticker()
             clients.monitor.setCursorPos(1, i)
             clients.monitor.setTextColor(colors.green)
             clients.monitor.write(string.format("[%s] Topics: %d. ", id, #topics))
-            local last_seen=math.floor(os.clock() - time)
-            if last_seen>40 then
+            local last_seen = math.floor(os.clock() - time)
+            if last_seen > 40 then
                 clients.monitor.setTextColor(colors.yellow)
             end
-            if last_seen>60 then
+            if last_seen > 60 then
                 clients.monitor.setTextColor(colors.orange)
             end
-            if last_seen>80 then
+            if last_seen > 80 then
                 clients.monitor.setTextColor(colors.red)
             end
-            
-            clients.monitor.write("Last seen: "..last_seen)
+
+            clients.monitor.write("Last seen: " .. last_seen)
             clients.monitor.setTextColor(colors.green)
         end
     end
@@ -59,6 +71,8 @@ function clients.addClient(id)
     for i, v in ipairs(clients.connected) do
         if v.id == id then
             logger.log(id .. " was already connected!", "warning")
+            table.remove(clients.connected,i)
+            table.insert(clients.connected, { ["id"] = id, ["time"] = os.clock(), ["topics"] = {} })
             return
         end
     end

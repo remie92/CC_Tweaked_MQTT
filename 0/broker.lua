@@ -45,6 +45,9 @@ function do_message_queue()
             if protocol=="CONNECT" then
                 clients.addClient(id)
             end
+            if protocol=="SUBSCRIBE" then
+                clients.addTopic(id,text)
+            end
         end
     end
 end
