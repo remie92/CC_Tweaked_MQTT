@@ -38,7 +38,7 @@ function do_message_queue()
             local text = message[2]
             local protocol = message[3]
             logger.log("Processing "..protocol.." from "..id,"processing_message")
-            client.got_update(id)
+            clients.got_update(id)
             if protocol == "MQTT_LIB" then
                 lib_sender(id)
             end
