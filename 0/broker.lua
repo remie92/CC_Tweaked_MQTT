@@ -48,6 +48,9 @@ function do_message_queue()
             if protocol=="SUBSCRIBE" then
                 clients.addTopic(id,text)
             end
+            if protocol=="PUBLISH" then
+                clients.publish(text)
+            end
         end
     end
 end

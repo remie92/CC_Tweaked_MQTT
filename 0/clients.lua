@@ -30,6 +30,20 @@ function clients.addTopic(id, topic)
     end
 end
 
+function clients.publish(data)
+    local topic, text = data[1], data[2]
+    local counter=0
+    for i, v in ipairs(clients.connected) do
+        for _, top in ipairs(v.topics) do
+            if top == topic then
+                rednet.send(v.id,text,"PUBLISHED")
+                counter=counter+1
+            end
+        end
+    end
+    logger.log(text .. " send on " .. topic .." x "..counter, "debug")
+end
+
 function clients.client_ticker()
     while true do
         sleep(0.4)
@@ -71,7 +85,7 @@ function clients.addClient(id)
     for i, v in ipairs(clients.connected) do
         if v.id == id then
             logger.log(id .. " was already connected!", "warning")
-            table.remove(clients.connected,i)
+            table.remove(clients.connected, i)
             table.insert(clients.connected, { ["id"] = id, ["time"] = os.clock(), ["topics"] = {} })
             return
         end
