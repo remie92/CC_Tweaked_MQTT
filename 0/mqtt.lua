@@ -1,4 +1,18 @@
-print("Okay, this is a nice test MQTT file!")
-while true do
-    print("Even Multiple lines!")
+mqtt={}
+
+function mqtt.init(broker_id)
+    mqtt.broker=broker_id
+    rednet.send(mqtt.broker,"connect","CONNECT")
+end
+
+
+function mqtt.pinger()
+    while true do
+        rednet.send(mqtt.broker,"Hehe, ping!","PING")
+        sleep(10)
+    end
+end
+
+function mqtt.subscribe(topic)
+
 end

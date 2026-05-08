@@ -1,6 +1,9 @@
 require("logger")
+require("clients")
 logger.setMonitor(peripheral.wrap("left"))
 logger.setLogAll()
+clients.setMonitor(peripheral.wrap("top"))
+clients.setLogger(logger)
 peripheral.find("modem", rednet.open)
 
 function lib_sender(id)
@@ -21,7 +24,7 @@ function rednet_receiver()
         print("Waiting for message!")
         local id, message, protocol = rednet.receive()
         table.insert(message_queue, { id, message, protocol })
-        logger.log(("Client %d sent %s as %s"):format(id, text, protocol),"received_message")
+        logger.log(("Client %d sent %s as %s"):format(id, message, protocol),"received_message")
     end
 end
 
@@ -30,13 +33,17 @@ function do_message_queue()
     while true do
         sleep(0)
         if #message_queue > 0 then
-            message = table.remove(message_queue, 1)
-            id = message[1]
-            text = message[2]
-            protocol = message[3]
+            local message = table.remove(message_queue, 1)
+            local id = message[1]
+            local text = message[2]
+            local protocol = message[3]
             logger.log("Processing "..protocol.." from "..id,"processing_message")
+            client.got_update(id)
             if protocol == "MQTT_LIB" then
                 lib_sender(id)
+            end
+            if protocol=="CONNECT" then
+                clients.addClient(id)
             end
         end
     end
@@ -51,7 +58,7 @@ function do_log_update()
 end
 
 while true do
-    parallel.waitForAll(rednet_receiver, do_message_queue,do_log_update)
+    parallel.waitForAll(rednet_receiver, do_message_queue,do_log_update,clients.client_ticker)
     rednet_receiver()
     sleep(1)
 end

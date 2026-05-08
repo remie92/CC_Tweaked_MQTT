@@ -10,6 +10,7 @@ logger.logTypes={
     ["received_message"]=5,
     ["sent_message"]=6,
     ["processing_message"]=7,
+    ["connection"]=8
 }
 
 
@@ -23,6 +24,19 @@ logger.typeToText={
     [5]="RX",
     [6]="TX",
     [7]="RUN",
+    [8]="CONN"
+}
+logger.typeToColor={
+    [-1]=colors.lightGray,
+    [0]=colors.red,
+    [1]=colors.orange,
+    [2]=colors.yellow,
+    [3]=colors.lightBlue,
+    [4]=colors.white,
+    [5]=colors.lime,
+    [6]=colors.green,
+    [7]=colors.white,
+    [8]=colors.white,
 }
 
 
@@ -89,8 +103,13 @@ function logger.draw()
             local text=v[1]
             local type=v[2]
             local time=v[3]
+            logger.monitor.setTextColor(colors.white)
             logger.monitor.setCursorPos(1,index)
-            logger.monitor.write(secondToString(time)..": {"..logger.typeToText[type].."} "..text)
+            logger.monitor.write(secondToString(time)..": {")
+            logger.monitor.setTextColor(logger.typeToColor[type])
+            logger.monitor.write(logger.typeToText[type])
+            logger.monitor.setTextColor(colors.white)
+            logger.monitor.write("} "..text)
             index=index+1
         end
     end
